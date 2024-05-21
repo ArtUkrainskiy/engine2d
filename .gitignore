@@ -1,0 +1,4 @@
+.idea*
+./cmake-*
+*.tar.gz
+*.out
