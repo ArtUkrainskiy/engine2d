@@ -5,7 +5,7 @@
 #ifndef INC_2DSDL_VERTEXARRAYOBJECT_H
 #define INC_2DSDL_VERTEXARRAYOBJECT_H
 
-#include <GL/glew.h>
+#include <GLES3/gl3.h>
 #include <vector>
 #include <iostream>
 

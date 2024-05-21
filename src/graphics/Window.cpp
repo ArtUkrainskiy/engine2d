@@ -4,7 +4,8 @@
 
 #include "Window.h"
 
-#include <GL/glew.h>
+#include <GLES3/gl3.h>
+
 
 Window::Window(uint16_t width, uint16_t height) : width(width), height(height) {
     running = true;
@@ -16,6 +17,16 @@ int Window::init() {
         std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
         return 1;
     }
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    // Установка профиля OpenGL Core
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+#ifdef __APPLE__
+    std::cout << "I'm apple machine" << std::endl;
+    SDL_GL_SetAttribute(static_cast<SDL_GLattr>(SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG), 1);
+#endif
 
     window = SDL_CreateWindow("Blue Paper Game",
                               SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -34,9 +45,9 @@ int Window::init() {
     }
 
 //    SDL_GL_SetSwapInterval(0);
-
-    glewExperimental = GL_TRUE;
-    glewInit();
+//
+//    glewExperimental = GL_TRUE;
+//    glewInit();
 
     const GLubyte* version = glGetString(GL_VERSION);
     const GLubyte* shaderVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);

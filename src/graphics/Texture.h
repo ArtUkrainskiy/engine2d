@@ -9,7 +9,8 @@
 #include <string_view>
 
 #include <SDL2/SDL_image.h>
-#include <GL/glew.h>
+#include <GLES3/gl3.h>
+
 #include <glm/vec2.hpp>
 
 class Texture {

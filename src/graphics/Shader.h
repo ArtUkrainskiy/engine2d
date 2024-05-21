@@ -5,7 +5,8 @@
 #ifndef INC_2DSDL_SHADER_H
 #define INC_2DSDL_SHADER_H
 
-#include <GL/glew.h>
+#include <GLES3/gl3.h>
+
 #include <string_view>
 #include <glm/gtc/type_ptr.hpp>
 
