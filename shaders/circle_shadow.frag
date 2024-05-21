@@ -2,6 +2,8 @@
 precision mediump float;
 #endif
 
+out vec4 fragColor;
+
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
@@ -48,7 +50,7 @@ void main() {
     } else {
         color = distance(gl_FragCoord.xy, m_coord);
         vec3 calc = vec3(1.000, 0.458, 0.313) - color * 0.002;
-        gl_FragColor = vec4(calc.xyz, 1);
+        fragColor = vec4(calc.xyz, 1);
     }
     // vec2 st = gl_FragCoord.xy/u_resolution;
     // gl_FragColor = vec4(st.x,st.y,0.0,1.0) * color;

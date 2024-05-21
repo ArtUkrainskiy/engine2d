@@ -3,6 +3,7 @@ out vec4 color;
 uniform vec2 cursorPos;
 uniform float time;
 uniform vec4 col;
+out vec4 fragColor;
 void main()
 {
 
@@ -19,6 +20,6 @@ void main()
     }
 
     //    vec3 calc = vec3(1.000,0.458,0.313) - col * 0.002;
-    gl_FragColor = vec4(0, 0, 0, col);
+    fragColor = vec4(0, 0, 0, col);
 
 }

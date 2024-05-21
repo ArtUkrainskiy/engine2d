@@ -98,7 +98,7 @@ public:
         shader->setActive();
         shader->setUniform("projection", transform->getTransform());
         vao->bind();
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 4, 1);
+        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, 1);
     };
 
     ~Object(){
