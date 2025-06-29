@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
 
         i++;
         // continue;
-        if (i % 3 != 0) {
+        if (i % 60 != 0) {
             continue;
         }
         time += 0.016f; // Assume 60 FPS

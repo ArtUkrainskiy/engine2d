@@ -17,16 +17,19 @@ class WireObject : public Object {
 public:
     WireObject(glm::vec2 pos, glm::vec2 size, const std::shared_ptr<Shader> &shader, glm::vec4 color) :
             Object(pos, size, shader), color(color) {
-
-        recalculateBuffer();
+        // Buffer will be calculated on first draw via dirty flagging
     }
 
-    void setColor(glm::vec4 newColor){
+    void setColor(const glm::vec4& newColor) {
         color = newColor;
     }
 
     void draw() override {
-        recalculateBuffer();
+        // Only recalculate buffer if transform changed (inherited from Object)
+        if (isDirty() || bufferDirty) {
+            recalculateBuffer();
+            bufferDirty = false;
+        }
 
         shader->setActive();
         vao->bind();
@@ -52,11 +55,14 @@ public:
 
     void recalculateBuffer() override {
         // WireObject needs 4 vertices for GL_LINE_LOOP (rectangle outline)
+        const glm::vec2& pos = getPosition();
+        const glm::vec2& objSize = getSize();
+        
         float vertexes[] = {
-                position.x, position.y,                    // Bottom-left
-                position.x + size.x, position.y,          // Bottom-right
-                position.x + size.x, position.y + size.y, // Top-right
-                position.x, position.y + size.y           // Top-left
+                pos.x, pos.y,                      // Bottom-left
+                pos.x + objSize.x, pos.y,          // Bottom-right
+                pos.x + objSize.x, pos.y + objSize.y, // Top-right
+                pos.x, pos.y + objSize.y           // Top-left
         };
         vao->updateBufferData(VertexArrayObject::VERTEX_BUFFER, vertexes, 8 * sizeof(float));
     }

@@ -23,20 +23,40 @@ public:
                    const std::shared_ptr<Texture> &texture) :
             Object(pos, size, shader), texture(texture) {
 
+        // Setup static texture coordinates once
+        setupTextureCoordinates();
+        // Vertex coordinates will be calculated on demand via recalculateBuffer()
+    }
 
-        float vertexes[] = {
-                // Triangle 1: Bottom-left quad triangle
-                pos.x, pos.y,                           // Bottom-left
-                pos.x + size.x, pos.y,                  // Bottom-right
-                pos.x, pos.y + size.y,                  // Top-left
-                
-                // Triangle 2: Top-right quad triangle
-                pos.x + size.x, pos.y,                  // Bottom-right
-                pos.x + size.x, pos.y + size.y,        // Top-right
-                pos.x, pos.y + size.y                   // Top-left
-        };
+    void setTexture(std::shared_ptr<Texture> texture) {
+        if (this->texture != texture) {
+            this->texture = texture;
+            // Update size to match texture if needed
+            if (texture) {
+                setSize(texture->getSize());
+            }
+            // Buffer will be updated on next draw via dirty flagging
+        }
+    }
 
-        float texcoords[] = {
+    void setMaterial(std::shared_ptr<Shader> shader) {
+        this->shader = shader;
+    }
+
+    void draw() override {
+        if (texture) {
+            texture->bind();
+        }
+        Object::draw(); // Uses optimized dirty flagging
+    }
+
+protected:
+    std::shared_ptr<Texture> texture;
+
+private:
+    void setupTextureCoordinates() {
+        // Setup texture coordinates once - they don't change with position
+        static const float texcoords[] = {
                 // Triangle 1: Bottom-left quad triangle
                 0.0f, 0.0f,     // Bottom-left
                 1.0f, 0.0f,     // Bottom-right
@@ -48,38 +68,8 @@ public:
                 0.0f, 1.0f      // Top-left
         };
 
-        vao->createBuffer(VertexArrayObject::VERTEX_BUFFER, vertexes, 12 * sizeof(float));
-        vao->createBuffer(VertexArrayObject::TEXTURE_BUFFER, texcoords, 12 * sizeof(float));
+        vao->updateBufferData(VertexArrayObject::TEXTURE_BUFFER, texcoords, 12 * sizeof(float));
     }
-
-    void setTexture(std::shared_ptr<Texture> texture) {
-        this->texture = texture;
-        float vertexes[] = {
-                // Triangle 1: Bottom-left quad triangle
-                position.x, position.y,                                    // Bottom-left
-                position.x + texture->getSize().x, position.y,            // Bottom-right
-                position.x, position.y + texture->getSize().y,            // Top-left
-                
-                // Triangle 2: Top-right quad triangle
-                position.x + texture->getSize().x, position.y,            // Bottom-right
-                position.x + texture->getSize().x, position.y + texture->getSize().y,  // Top-right
-                position.x, position.y + texture->getSize().y             // Top-left
-        };
-        vao->updateBufferData(VertexArrayObject::VERTEX_BUFFER, vertexes, 12 * sizeof(float));
-    }
-
-    void setMaterial(std::shared_ptr<Shader> shader) {
-        this->shader = shader;
-    }
-
-    void draw() override {
-        recalculateBuffer();
-        texture->bind();
-        Object::draw();
-    }
-
-protected:
-    std::shared_ptr<Texture> texture;
 
 };
 
