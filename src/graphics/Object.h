@@ -13,14 +13,14 @@
 
 #include "VertexArrayObject.h"
 #include "Shader.h"
-#include "../math/ObjectTransform.h"
+#include "../core/Transform.h"
 #include "../core/ServiceProvider.h"
 #include "../core/Camera.h"
 
-class Object : public ObjectTransform {
+class Object {
 public:
     Object(glm::vec2 position, glm::vec2 size, const std::shared_ptr<Shader> &shader) :
-            ObjectTransform(position, size), shader(shader), bufferDirty(true) {
+            transform(position, size), shader(shader), bufferDirty(true) {
         vao = std::make_shared<VertexArrayObject>();
 
         vao->createBuffer(vao->VERTEX_BUFFER, nullptr, 0);
@@ -38,36 +38,47 @@ public:
         return name;
     }
 
-    void setCenterPosition(glm::vec2 center) {
-        ObjectTransform::setCenterPosition(center);
+    // Transform delegation with buffer dirty marking
+    void setCenterPosition(const glm::vec2& center) {
+        transform.setCenterPosition(center);
         markBufferDirty();
     }
 
-    // Override transform methods to mark buffer dirty
     void setPosition(const glm::vec2& newPosition) {
-        ObjectTransform::setPosition(newPosition);
+        transform.setPosition(newPosition);
         markBufferDirty();
     }
 
     void setSize(const glm::vec2& newSize) {
-        ObjectTransform::setSize(newSize);
+        transform.setSize(newSize);
         markBufferDirty();
     }
 
     void setAngle(float rotationAngle) {
-        ObjectTransform::setAngle(rotationAngle);
+        transform.setAngle(rotationAngle);
         markBufferDirty();
     }
 
     void setScale(float newScale) {
-        ObjectTransform::setScale(newScale);
+        transform.setScale(newScale);
         markBufferDirty();
     }
 
-    void translatePosition(const glm::vec2& delta) {
-        ObjectTransform::translatePosition(delta);
+    void translate(const glm::vec2& delta) {
+        transform.translate(delta);
         markBufferDirty();
     }
+
+    // Transform getters
+    const glm::vec2& getPosition() const { return transform.getPosition(); }
+    const glm::vec2& getSize() const { return transform.getSize(); }
+    float getAngle() const { return transform.getAngle(); }
+    float getScale() const { return transform.getScale(); }
+    const glm::vec2& getCenterPosition() const { return transform.getCenterPosition(); }
+
+    // Access to transform for advanced operations
+    Transform& getTransform() { return transform; }
+    const Transform& getTransform() const { return transform; }
 
 
     virtual void addChild(const std::shared_ptr<Object> &child) {
@@ -77,7 +88,7 @@ public:
 
     virtual void draw() {
         // Only recalculate buffer if transform changed
-        if (isDirty() || bufferDirty) {
+        if (transform.isDirty() || bufferDirty) {
             recalculateBuffer();
             bufferDirty = false;
         }
@@ -88,10 +99,10 @@ public:
         if (const auto camera = ServiceProvider::get<Camera>()) {
             shader->setUniform("projection", camera->getProjectionMatrix());
             shader->setUniform("view", camera->getViewMatrix());
-            shader->setUniform("model", getModelMatrix());
+            shader->setUniform("model", transform.getModelMatrix());
         } else {
             // Fallback: use identity matrices and model transform as projection
-            shader->setUniform("projection", getModelMatrix());
+            shader->setUniform("projection", transform.getModelMatrix());
             shader->setUniform("view", glm::mat4(1.0f));
             shader->setUniform("model", glm::mat4(1.0f));
         }
@@ -104,21 +115,25 @@ public:
     };
 
     virtual void recalculateBuffer() {
+        const glm::vec2& pos = transform.getPosition();
+        const glm::vec2& size = transform.getSize();
+        
         float vertexes[] = {
                 // Triangle 1: Bottom-left quad triangle
-                position.x, position.y,                    // Bottom-left
-                position.x + size.x, position.y,          // Bottom-right  
-                position.x, position.y + size.y,          // Top-left
+                pos.x, pos.y,                    // Bottom-left
+                pos.x + size.x, pos.y,          // Bottom-right  
+                pos.x, pos.y + size.y,          // Top-left
                 
                 // Triangle 2: Top-right quad triangle  
-                position.x + size.x, position.y,          // Bottom-right
-                position.x + size.x, position.y + size.y, // Top-right
-                position.x, position.y + size.y           // Top-left
+                pos.x + size.x, pos.y,          // Bottom-right
+                pos.x + size.x, pos.y + size.y, // Top-right
+                pos.x, pos.y + size.y           // Top-left
         };
         vao->updateBufferData(VertexArrayObject::VERTEX_BUFFER, vertexes, 12 * sizeof(float));
     }
 
 protected:
+    Transform transform;
     std::shared_ptr<Shader> shader;
     std::shared_ptr<VertexArrayObject> vao;
 

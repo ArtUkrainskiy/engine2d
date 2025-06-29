@@ -38,12 +38,12 @@ public:
 
     void setTarget(glm::vec2 newTarget) {
         target = newTarget;
-        direction = glm::normalize(target - position);
+        direction = glm::normalize(target - getPosition());
     }
 
     void update(float deltaTime) {
         setAngle(getAngle() + rotationSpeed * deltaTime);
-        translatePosition(direction * speed * deltaTime);
+        translate(direction * speed * deltaTime);
     }
 
     bool isAlive() const {

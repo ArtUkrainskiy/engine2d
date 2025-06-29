@@ -43,19 +43,16 @@ int main(int argc, char* argv[]) {
     // resourceManager->get<Shader>("rect")->setUniform("col", {1.0f, 1.0f, 1.0f, 1.0f});
 
 
-    // Create full BatchedObject with instanced rendering
-    class BatchedObjectWrapper : public Object {
+    // Create BatchedObject with a simple wrapper that integrates with Object system
+    class SimpleBatchRenderer : public Object {
     public:
-        BatchedObjectWrapper(std::shared_ptr<BatchedObject> batcher, const std::shared_ptr<Shader>& shaderPtr)
-            : Object({0, 0}, {0, 0}, shaderPtr), batchRenderer(batcher) {}
+        SimpleBatchRenderer(std::shared_ptr<BatchedObject> batcher)
+            : Object({0, 0}, {0, 0}, nullptr), batchRenderer(batcher) {}
 
         void draw() override {
-            // Get camera matrices for batched rendering
+            // Update projection matrix before drawing
             if (const auto camera = ServiceProvider::get<Camera>()) {
-                // For batched rendering, we can use combined matrix since instances handle model transforms
                 batchRenderer->setProjectionMatrix(camera->getViewProjectionMatrix());
-            } else {
-                batchRenderer->setProjectionMatrix(getModelMatrix());
             }
             batchRenderer->draw();
         }
@@ -64,7 +61,8 @@ int main(int argc, char* argv[]) {
     };
 
     auto batchRenderer = std::make_shared<BatchedObject>(resourceManager->get<Shader>("batched"));
-    auto batchWrapper = std::make_shared<BatchedObjectWrapper>(batchRenderer, resourceManager->get<Shader>("batched"));
+    auto batchWrapper = std::make_shared<SimpleBatchRenderer>(batchRenderer);
+    
     layer->addObject(batchWrapper);
     layer->addObject(ship);
 
@@ -95,6 +93,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Rendering " << objectIndices.size() << " objects" << std::endl;
     int i = 0;
     while (engine->update()) {
+        // Objects are now drawn automatically by the engine through RenderLayer
         frames++;
         if (frames % 1000 == 0) {
             auto now = std::chrono::high_resolution_clock::now();

@@ -53,7 +53,7 @@ public:
         }
 
         offset *= speed * deltaTime;
-        this->translatePosition(offset);
+        this->translate(offset);
 
         weaponTimer->update();
         projectilePool->update(deltaTime);

@@ -41,7 +41,7 @@ public:
         float offsetY = -300 * deltaTime * glm::cos(radians); // Отрицательное значение, так как движение вниз
 
         // Изменяем позицию объекта с учётом угла
-        translatePosition(glm::vec2(offsetX, offsetY));
+        translate(glm::vec2(offsetX, offsetY));
     }
 
     void collide(Object *object) override {

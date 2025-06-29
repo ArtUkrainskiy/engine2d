@@ -26,7 +26,7 @@ public:
 
     void draw() override {
         // Only recalculate buffer if transform changed (inherited from Object)
-        if (isDirty() || bufferDirty) {
+        if (transform.isDirty() || bufferDirty) {
             recalculateBuffer();
             bufferDirty = false;
         }
@@ -39,10 +39,10 @@ public:
         if (const auto camera = ServiceProvider::get<Camera>()) {
             shader->setUniform("projection", camera->getProjectionMatrix());
             shader->setUniform("view", camera->getViewMatrix());
-            shader->setUniform("model", getModelMatrix());
+            shader->setUniform("model", transform.getModelMatrix());
         } else {
             // Fallback: use identity matrices and model transform as projection
-            shader->setUniform("projection", getModelMatrix());
+            shader->setUniform("projection", transform.getModelMatrix());
             shader->setUniform("view", glm::mat4(1.0f));
             shader->setUniform("model", glm::mat4(1.0f));
         }

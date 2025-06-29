@@ -49,7 +49,6 @@ ADD_LIBRARY(engine
         src/graphics/WireObject.cpp
         src/physics/CollisionDetector.cpp
         src/physics/PhysicObject.cpp
-        src/math/ObjectTransform.cpp
         src/game/AsteroidObject.cpp
         src/game/PlayerShip.cpp
         src/game/ProjectileObject.cpp
@@ -114,6 +113,7 @@ ADD_LIBRARY(engine
         src/core/UpgradeManager.h
         src/core/Camera.cpp
         src/core/Camera.h
+        src/core/Transform.h
 )
 
 # Связать библиотеки

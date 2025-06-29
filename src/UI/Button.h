@@ -30,7 +30,7 @@ public:
                 mousePos = camera->screenToWorld(mousePos);
             }
 
-            if (isInside(mousePos, this->position, this->size)) {
+            if (isInside(mousePos, this->getPosition(), this->getSize())) {
                 clicked();
             }
         }

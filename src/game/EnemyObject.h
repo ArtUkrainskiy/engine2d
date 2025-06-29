@@ -36,7 +36,8 @@ public:
     void update(float deltaTime) {
         setAngle(0);
         float xOffset = 150 * cos(SDL_GetTicks() / 1000.0f * 1);
-        setPosition({x + xOffset, position.y += 50 * deltaTime});
+        glm::vec2 currentPos = getPosition();
+        setPosition({x + xOffset, currentPos.y + 50 * deltaTime});
         weaponTimer->update();
     }
 
