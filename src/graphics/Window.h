@@ -9,19 +9,20 @@
 #include <cstdint>
 #include <iostream>
 #include <SDL2/SDL.h>
-#include "../core/EventObserver.h"
+#include "../core/IEventObserver.h"
+#include "../core/InputHandler.h"
+#include "../core/IWindow.h"
 
 
-class Window : public EventObserver{
-
-
+class Window : public IWindow, public IEventObserver {
 public:
     Window(uint16_t width, uint16_t height);
 
-    int init();
+
+    int init() final;
 
 
-    bool update();
+    bool update() override;
 
     void onNotify(SDL_Event &event) override {
         if (event.type == SDL_QUIT) {
@@ -29,13 +30,17 @@ public:
         }
     }
 
+    InputHandler *getInputHandler() override{
+        return inputHandler;
+    }
+
+    glm::vec2 getWindowSize() final{
+        return {width, height};
+    }
+
 private:
-    bool running;
-
-    uint16_t width;
-    uint32_t height;
-
     SDL_Window *window{};
+    InputHandler *inputHandler;
 };
 
 

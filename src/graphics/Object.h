@@ -14,125 +14,122 @@
 #include "VertexArrayObject.h"
 #include "Shader.h"
 #include "../math/ObjectTransform.h"
+#include "../core/ServiceProvider.h"
+#include "../core/Camera.h"
 
-class Object {
+class Object : public ObjectTransform {
 public:
-    Object(glm::vec2 pos, glm::vec2 size, const std::shared_ptr<Shader> &shader) :
-            position(pos), size(size), shader(shader) {
+    Object(glm::vec2 position, glm::vec2 size, const std::shared_ptr<Shader> &shader) :
+            ObjectTransform(position, size), shader(shader), bufferDirty(true) {
         vao = std::make_shared<VertexArrayObject>();
-
-        transform = std::make_shared<ObjectTransform>(position, size);
 
         vao->createBuffer(vao->VERTEX_BUFFER, nullptr, 0);
         vao->createBuffer(vao->TEXTURE_BUFFER, nullptr, 0);
         vao->createBuffer(vao->INSTANCE_BUFFER, nullptr, 0);
-        recalculateBuffer();
+        // recalculateBuffer();
 
     }
 
-    void setName(std::string objectName){
+    void setName(const std::string &objectName) {
         name = objectName;
     }
 
-    std::string getName(){
+    std::string getName() {
         return name;
     }
 
-    void linkPosition(const std::shared_ptr<Object> &object) {
-        linkedPosition = &object->position;
-    }
-
-    void setPosition(glm::vec2 pos) {
-        transform->setPosition(pos);
-        position = pos;
-        recalculateBuffer();
-    }
-
     void setCenterPosition(glm::vec2 center) {
-        position = center - size / 2.f;
-        transform->setPosition(position);
-        recalculateBuffer();
+        ObjectTransform::setCenterPosition(center);
+        markBufferDirty();
     }
 
-    glm::vec2 getCenterPosition(){
-        return position + size / 2.f;
+    // Override transform methods to mark buffer dirty
+    void setPosition(const glm::vec2& newPosition) {
+        ObjectTransform::setPosition(newPosition);
+        markBufferDirty();
     }
 
-    void movePosition(glm::vec2 offset) {
-        for (const auto &item: childs){
-            item->movePosition(offset);
-        }
-        position += offset;
-        transform->setPosition(position);
-        recalculateBuffer();
+    void setSize(const glm::vec2& newSize) {
+        ObjectTransform::setSize(newSize);
+        markBufferDirty();
     }
 
-    void setSize(glm::vec2 newSize) {
-        size = newSize;
-        transform->setSize(newSize);
-        recalculateBuffer();
+    void setAngle(float rotationAngle) {
+        ObjectTransform::setAngle(rotationAngle);
+        markBufferDirty();
     }
 
-    virtual inline glm::vec2 getPosition(){
-        return position;
+    void setScale(float newScale) {
+        ObjectTransform::setScale(newScale);
+        markBufferDirty();
     }
 
-    virtual inline glm::vec2 getSize(){
-        return size;
+    void translatePosition(const glm::vec2& delta) {
+        ObjectTransform::translatePosition(delta);
+        markBufferDirty();
     }
 
-    virtual void addChild(std::shared_ptr<Object> child){
+
+    virtual void addChild(const std::shared_ptr<Object> &child) {
         child->setCenterPosition(this->getCenterPosition());
         childs.push_back(child);
     }
 
-    virtual void setAngle(float_t angle){
-        transform->setRotationAngle(transform->getAngle() + angle);
-    }
-
-    virtual float getAngle(){
-        return transform->getAngle();
-    }
-
     virtual void draw() {
-        shader->setActive();
-        shader->setUniform("projection", transform->getTransform());
-        vao->bind();
-        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, 1);
-    };
-
-    ~Object(){
-
-    };
-
-public:
-    virtual void recalculateBuffer() {
-        if (linkedPosition) {
-            position = *linkedPosition;
+        // Only recalculate buffer if transform changed
+        if (isDirty() || bufferDirty) {
+            recalculateBuffer();
+            bufferDirty = false;
         }
+
+        shader->setActive();
+        
+        // Get camera matrices - use separate matrices for modern rendering
+        if (const auto camera = ServiceProvider::get<Camera>()) {
+            shader->setUniform("projection", camera->getProjectionMatrix());
+            shader->setUniform("view", camera->getViewMatrix());
+            shader->setUniform("model", getModelMatrix());
+        } else {
+            // Fallback: use identity matrices and model transform as projection
+            shader->setUniform("projection", getModelMatrix());
+            shader->setUniform("view", glm::mat4(1.0f));
+            shader->setUniform("model", glm::mat4(1.0f));
+        }
+        
+        vao->bind();
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+        for (const auto &item: childs) {
+            item->draw();
+        }
+    };
+
+    virtual void recalculateBuffer() {
         float vertexes[] = {
-                position.x, position.y,
-                position.x + size.x, position.y,
-                position.x + size.x, position.y + size.y,
-                position.x, position.y + size.y
+                // Triangle 1: Bottom-left quad triangle
+                position.x, position.y,                    // Bottom-left
+                position.x + size.x, position.y,          // Bottom-right  
+                position.x, position.y + size.y,          // Top-left
+                
+                // Triangle 2: Top-right quad triangle  
+                position.x + size.x, position.y,          // Bottom-right
+                position.x + size.x, position.y + size.y, // Top-right
+                position.x, position.y + size.y           // Top-left
         };
-        vao->updateBufferData(VertexArrayObject::VERTEX_BUFFER, vertexes, 8 * sizeof(float));
+        vao->updateBufferData(VertexArrayObject::VERTEX_BUFFER, vertexes, 12 * sizeof(float));
     }
 
+protected:
     std::shared_ptr<Shader> shader;
     std::shared_ptr<VertexArrayObject> vao;
 
-    std::shared_ptr<ObjectTransform> transform;
-
     std::string name;
-
-    glm::vec2 position;
-    glm::vec2 *linkedPosition = nullptr;
-    glm::vec2 size;
-
-
+    bool bufferDirty;
 
     std::vector<std::shared_ptr<Object>> childs;
+
+    void markBufferDirty() {
+        bufferDirty = true;
+    }
 };
 
 

@@ -5,16 +5,19 @@
 #ifndef INC_2DSDL_OPENGLRENDERER_H
 #define INC_2DSDL_OPENGLRENDERER_H
 
+#include <iostream>
+#include <ostream>
+
 #include "GL/glew.h"
 
 class OpenGLRenderer {
 public:
-    void init() {
+    static void init() {
         glewExperimental = GL_TRUE;
         glewInit();
     }
 
-    void render() {
+    static void render() {
         glClearColor(90./255., 145./255., 255./255., 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
     }

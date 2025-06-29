@@ -65,8 +65,13 @@ public:
         glBindVertexArray(0);
     }
 
-private:
+    GLuint getBuffer(uint64_t id) const {
+        return buffers[id];
+    }
+
     GLuint vao{};
+
+private:
     GLuint buffers[10];
 };
 

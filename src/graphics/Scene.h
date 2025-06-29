@@ -12,15 +12,31 @@
 
 #include "RenderLayer.h"
 #include "Tile.h"
+#include "../core/IGameScene.h"
 
-class Scene {
-
+class Scene : public IGameScene {
 public:
-    void addRenderLayer(const std::shared_ptr<RenderLayer>& layer){
-        layers.push_back(layer);
+    void initialize() override {
+
     }
 
-    void draw(){
+    void activate() override {
+
+    }
+
+    void update(float timeDelta) override {
+
+    }
+
+    void deactivate() override {
+
+    }
+
+    void destroy() override {
+
+    }
+
+    void render(float timeDelta) override{
         for (const auto &item: layers){
             item->draw();
         }
@@ -28,7 +44,6 @@ public:
 
 private:
 
-    std::vector<std::shared_ptr<RenderLayer>> layers;
 };
 
 

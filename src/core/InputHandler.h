@@ -8,7 +8,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <iostream>
-#include "EventObserver.h"
+#include "IEventObserver.h"
 
 class InputHandler {
 public:
@@ -19,11 +19,11 @@ public:
         }
     }
 
-    void addObserver(EventObserver* observer) {
+    void addObserver(IEventObserver* observer) {
         observers.push_back(observer);
     }
 
-    void removeObserver(EventObserver* observer) {
+    void removeObserver(IEventObserver* observer) {
         // реализация удаления наблюдателя
     }
 
@@ -34,7 +34,7 @@ private:
         }
     }
 
-    std::vector<EventObserver*> observers;
+    std::vector<IEventObserver*> observers;
 };
 
 

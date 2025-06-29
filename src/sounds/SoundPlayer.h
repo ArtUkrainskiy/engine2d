@@ -9,8 +9,9 @@
 #include <SDL2/SDL_mixer.h>
 #include <string>
 #include <unordered_set>
+#include "../graphics/Resource.h"
 
-class Sound {
+class Sound : public Resource {
 public:
     Sound(const std::string &filename) : m_filename(filename), m_chunk(nullptr), m_music(nullptr) {
         load();

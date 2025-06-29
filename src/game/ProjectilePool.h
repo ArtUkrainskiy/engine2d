@@ -17,7 +17,7 @@ public:
                    const std::shared_ptr<CollisionDetector> &newCollisionDetector) :
             projectileShader(shader), renderLayer(layer), collisionDetector(newCollisionDetector) {}
 
-    void getProjectile(glm::vec2 position, float angle) {
+    void getProjectile(glm::vec2 position, float angle, ProjectileObject::Owner owner) {
         auto projectile = std::make_shared<ProjectileObject>(
                 position,
                 glm::vec2(2, 3),
@@ -25,6 +25,8 @@ public:
                 glm::vec4(1, 1, 1, 1)
         );
         projectile->setAngle(angle);
+        projectile->setCenterPosition(position);
+        projectile->setOwner(owner);
         activeProjectiles.push_back(projectile);
         collisionDetector->addObject(projectile.get());
         renderLayer->addObject(projectile);
@@ -32,7 +34,7 @@ public:
 
     void update(float deltaTime) {
         for (auto it = activeProjectiles.begin(); it != activeProjectiles.end();) {
-            if ((*it)->getPosition().y <= 0) {
+            if ((*it)->getPosition().y <= 0 or (*it)->getPosition().y >= 600 or not (*it)->isAlive()) {
                 renderLayer->removeObject(*it);
                 collisionDetector->removeObject(it->get());
                 it = activeProjectiles.erase(it);

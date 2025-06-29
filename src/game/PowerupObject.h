@@ -25,7 +25,7 @@ public:
     }
 
     void update(float timeDelta){
-        movePosition({0, 100*timeDelta});
+        translatePosition({0, 100 * timeDelta});
     }
 
     int getType(){

@@ -11,15 +11,25 @@
 #include "../graphics/WireObject.h"
 #include "../physics/PhysicObject.h"
 #include "AsteroidObject.h"
+#include "../core/ScoreManager.h"
 
 class ProjectileObject : public WireObject, public PhysicObject {
 public:
+    enum Owner {
+        PLAYER = 0,
+        ENEMY
+    };
+
     ProjectileObject(glm::vec2 pos, glm::vec2 size, const std::shared_ptr<Shader> &shader, glm::vec4 color) :
-            WireObject(pos, size, shader, color) {
+            WireObject(pos, size, shader, color), alive(true), owner(PLAYER) {
     }
 
-    bool isActive() {
-        return true;
+    void setAlive(bool newAlive) {
+        alive = newAlive;
+    }
+
+    bool isAlive() {
+        return alive;
     }
 
     void update(float deltaTime) {
@@ -31,20 +41,34 @@ public:
         float offsetY = -300 * deltaTime * glm::cos(radians); // Отрицательное значение, так как движение вниз
 
         // Изменяем позицию объекта с учётом угла
-        movePosition(glm::vec2(offsetX, offsetY));
+        translatePosition(glm::vec2(offsetX, offsetY));
     }
 
     void collide(Object *object) override {
         if (auto asteroid = dynamic_cast<AsteroidObject *>(object)) {
-            asteroid->setAlive(false);
-        }
+            if (owner == PLAYER) {
+                if(!asteroid->applyDamage(1)){
+                    ServiceProvider::get<ScoreManager>()->addPoints(asteroid->getScore());
+                }
+                setAlive(false);
 
+            }
+        }
+    }
+
+    void setOwner(Owner newOwner) {
+        owner = newOwner;
+    }
+
+    Owner getOwner() {
+        return owner;
     }
 
 private:
+    bool alive;
     float speed{};
     glm::vec2 direction{};
-
+    Owner owner;
 
 };
 

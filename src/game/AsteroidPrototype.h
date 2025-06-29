@@ -24,8 +24,10 @@ public:
 
     AsteroidPrototype(const std::shared_ptr<Texture> &texture, const std::shared_ptr<Shader> &shader,
                       const std::pair<uint32_t, uint32_t> &sizeRange,
-                      const std::pair<float, float> &speedRange)
-            : texture(texture), shader(shader), sizeRange(sizeRange), speedRange(speedRange) {
+                      const std::pair<float, float> &speedRange,
+                      int health, int score
+                      )
+            : texture(texture), shader(shader), sizeRange(sizeRange), speedRange(speedRange), health(health), score(score) {
 
     }
 
@@ -34,10 +36,11 @@ public:
         auto speed = Utils::getRandomFloat(speedRange);
 
         auto asteroid = std::make_shared<AsteroidObject>(position, glm::vec2(size, size), shader, texture);
-//        asteroid->setAngle(Utils::getRandomFloat({0.f, 360.f}));
+        asteroid->setAngle(Utils::getRandomFloat({0.f, 360.f}));
         asteroid->setRotationSpeed(Utils::getRandomFloat({-150, 150}));
         asteroid->setSpeed(speed);
         asteroid->setTarget(target);
+        asteroid->initialize(health, score);
         return asteroid;
     }
 
@@ -46,6 +49,8 @@ private:
     std::shared_ptr<Shader> shader;
     std::pair<uint32_t, uint32_t> sizeRange;
     std::pair<float, float> speedRange;
+    int health;
+    int score;
 };
 
 

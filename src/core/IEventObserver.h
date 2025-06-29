@@ -8,7 +8,7 @@
 
 #include <SDL_events.h>
 
-class EventObserver {
+class IEventObserver {
 public:
     virtual void onNotify(SDL_Event& event) = 0;
 };

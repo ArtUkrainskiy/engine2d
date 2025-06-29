@@ -8,76 +8,144 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-
 class ObjectTransform {
 public:
-    ObjectTransform(glm::vec2 position, glm::vec2 size): leftTopPosition(position), size(size){
-        transformMatrix = glm::ortho(0.0f, (float) 800, (float) 600, 0.0f, -1.0f, 1.0f);
-        rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0, 0, 1));
-        objMatrix = transformMatrix * rotateMatrix;
+    ObjectTransform(const glm::vec2 position, const glm::vec2 size)
+            : position(position), size(size), angle(0.0f), scale(1.0f), 
+              transformDirty(true), centerDirty(true) {
     }
 
-    void setSize(glm::vec2 newSize){
-        size = newSize;
+    void setSize(const glm::vec2& newSize) {
+        if (size != newSize) {
+            size = newSize;
+            markDirty();
+        }
     }
 
-
-    void setPosition(glm::vec2 position){
-        leftTopPosition = position;
+    void setPosition(const glm::vec2& newPosition) {
+        if (position != newPosition) {
+            position = newPosition;
+            markDirty();
+        }
     }
 
-    glm::vec2 getPosition(){
-        return leftTopPosition;
+    const glm::vec2& getPosition() const {
+        return position;
     }
 
-    void setCenterPosition(glm::vec2 center){
-        centerPosition = center - size / 2.f;
+    const glm::vec2& getSize() const {
+        return size;
     }
 
-    glm::vec2 getCenterPosition(){
-        return centerPosition;
+    void translatePosition(const glm::vec2& delta) {
+        if (delta.x != 0.0f || delta.y != 0.0f) {
+            position += delta;
+            markDirty();
+        }
     }
 
-    void setRotationAngle(float_t rotationAngle){
-        rotate = rotationAngle;
-        glm::vec2 objectCenter = leftTopPosition + 0.5f * size;
-
-        // Переводим центр координат объекта в начало координат
-        glm::mat4 translateToOrigin = glm::translate(glm::mat4(1.0f), glm::vec3(-objectCenter, 0.0f));
-
-        // Выполняем поворот
-        glm::mat4 rotateMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationAngle), glm::vec3(0, 0, 1));
-
-        // Возвращаем центр координат объекта обратно в его исходное положение
-        glm::mat4 translateBack = glm::translate(glm::mat4(1.0f), glm::vec3(objectCenter, 0.0f));
-
-        // Собираем все матрицы вместе
-        glm::mat4 resultMatrix = transformMatrix * translateBack * rotateMatrix * translateToOrigin;
-
-
-        objMatrix = resultMatrix;
+    void setAngle(float rotationAngle) {
+        if (angle != rotationAngle) {
+            angle = rotationAngle;
+            transformDirty = true;
+        }
     }
 
-    virtual float_t getAngle(){
-        return rotate;
+    float getAngle() const {
+        return angle;
     }
 
-    glm::mat4 getTransform(){
-        return objMatrix;
+    void setScale(float newScale) {
+        if (scale != newScale) {
+            scale = newScale;
+            transformDirty = true;
+        }
     }
 
-private:
-    glm::vec2 centerPosition{};
-    glm::vec2 leftTopPosition{};
-    glm::vec2 size{};
+    float getScale() const {
+        return scale;
+    }
 
-    float_t scale{1};
-    float_t rotate{0};
+    // Lazy evaluation - only calculate when needed
+    const glm::mat4& getModelMatrix() const {
+        if (transformDirty) {
+            updateTransformMatrix();
+        }
+        return transformMatrix;
+    }
 
-    glm::mat4 transformMatrix{0};
-    glm::mat4 rotateMatrix{0};
-    glm::mat4 objMatrix{0};
+    // Cached center calculation
+    const glm::vec2& getCenterPosition() const {
+        if (centerDirty) {
+            cachedCenter = position + 0.5f * size;
+            centerDirty = false;
+        }
+        return cachedCenter;
+    }
+
+    void setCenterPosition(const glm::vec2& center) {
+        setPosition(center - 0.5f * size);
+    }
+
+    // Batch update multiple properties efficiently
+    void setTransform(const glm::vec2& newPosition, float newAngle, float newScale) {
+        bool needsUpdate = false;
+        
+        if (position != newPosition) {
+            position = newPosition;
+            needsUpdate = true;
+        }
+        if (angle != newAngle) {
+            angle = newAngle;
+            needsUpdate = true;
+        }
+        if (scale != newScale) {
+            scale = newScale;
+            needsUpdate = true;
+        }
+        
+        if (needsUpdate) {
+            markDirty();
+        }
+    }
+
+    // Check if transform has changed since last matrix calculation
+    bool isDirty() const {
+        return transformDirty;
+    }
+
+    static glm::vec2 extractPosition(const glm::mat4& transform) {
+        return {transform[3][0], transform[3][1]};
+    }
+
+protected:
+    glm::vec2 position;
+    glm::vec2 size;
+    float angle;
+    float scale;
+
+    // Cached data with dirty flags
+    mutable glm::mat4 transformMatrix{};
+    mutable glm::vec2 cachedCenter{};
+    mutable bool transformDirty;
+    mutable bool centerDirty;
+
+    void markDirty() {
+        transformDirty = true;
+        centerDirty = true;
+    }
+
+    void updateTransformMatrix() const {
+        const glm::vec2& center = getCenterPosition();
+
+        transformMatrix = glm::mat4(1.0f);
+        transformMatrix = glm::translate(transformMatrix, glm::vec3(center, 0.0f));
+        transformMatrix = glm::rotate(transformMatrix, glm::radians(angle), glm::vec3(0, 0, 1));
+        transformMatrix = glm::scale(transformMatrix, glm::vec3(scale, scale, 1.0f));
+        transformMatrix = glm::translate(transformMatrix, glm::vec3(-center, 0.0f));
+        
+        transformDirty = false;
+    }
 };
-
 
 #endif //INC_2DSDL_OBJECTTRANSFORM_H

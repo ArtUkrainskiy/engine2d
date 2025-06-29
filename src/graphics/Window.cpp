@@ -7,7 +7,9 @@
 #include <GLES3/gl3.h>
 
 
-Window::Window(uint16_t width, uint16_t height) : width(width), height(height) {
+Window::Window(uint16_t newWidth, uint16_t newHeight){
+    width = newWidth;
+    height = newHeight;
     running = true;
 }
 
@@ -44,7 +46,10 @@ int Window::init() {
         return 1;
     }
 
-//    SDL_GL_SetSwapInterval(0);
+    inputHandler = new InputHandler();
+    inputHandler->addObserver(this);
+
+    SDL_GL_SetSwapInterval(0);
 //
 //    glewExperimental = GL_TRUE;
 //    glewInit();
@@ -58,6 +63,7 @@ int Window::init() {
 }
 
 bool Window::update() {
+    inputHandler->handleInput();
     SDL_GL_SwapWindow(window);
     return running;
 }

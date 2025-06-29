@@ -13,9 +13,9 @@
 #include "Texture.h"
 
 
-class TextRenderer {
+class Font : public Resource {
 public:
-    TextRenderer(const std::string &fontFile, int fontSize) {
+    Font(const std::string &fontFile, int fontSize) {
         if (TTF_Init() == -1) {
             // Handle error
         }
@@ -27,7 +27,7 @@ public:
 
     }
 
-    ~TextRenderer() {
+    ~Font() {
         TTF_CloseFont(font);
         TTF_Quit();
     }

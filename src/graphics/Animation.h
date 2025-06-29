@@ -9,7 +9,15 @@
 class Animation {
 public:
     Animation(int frameDelayMs, std::shared_ptr<Texture> texture) : frameDelayMs(frameDelayMs),
-                                                                    texture(std::move(texture)) {}
+                                                                    texture(std::move(texture)) {
+
+    }
+
+    std::shared_ptr<Animation> clone(){
+        auto clone = std::make_shared<Animation>(frameDelayMs, texture);
+        clone->frames = frames;
+        return clone;
+    }
 
     void addFrame(glm::vec4 coords) {
         frames.push_back(coords);

@@ -11,7 +11,6 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "AsteroidObject.h"
-#include "AsteroidBuilder.h"
 #include "AsteroidPrototype.h"
 
 class AsteroidFactory {

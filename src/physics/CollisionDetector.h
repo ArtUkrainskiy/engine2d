@@ -43,8 +43,8 @@ public:
         size_t count = objects.size();
         for (size_t i = 0; i < count; ++i) {
             for (size_t j = i + 1; j < count; ++j) {
-                if (checkCollision(objects[i]->position, objects[i]->size,
-                                   objects[j]->position, objects[j]->size)) {
+                if (checkCollision(objects[i]->getPosition(), objects[i]->getSize(),
+                                   objects[j]->getPosition(), objects[j]->getSize())) {
 
                     if(auto physicObject = dynamic_cast<PhysicObject *>(objects[i])){
                         physicObject->collide(objects[j]);

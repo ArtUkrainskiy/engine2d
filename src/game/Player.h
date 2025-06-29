@@ -6,15 +6,17 @@
 #define INC_2DSDL_PLAYER_H
 
 #include <SDL_events.h>
-#include "../core/EventObserver.h"
+#include "../core/IEventObserver.h"
 #include "../graphics/TexturedObject.h"
 #include "../physics/PhysicObject.h"
 #include "ProjectilePool.h"
 #include "../utils/CallbackTimer.h"
 #include "PowerupObject.h"
 #include "PowerupPrototype.h"
+#include "../core/ScoreManager.h"
+
 class Player
-        : public EventObserver,
+        : public IEventObserver,
           public TexturedObject,
           public PhysicObject,
           public std::enable_shared_from_this<Player> {
@@ -26,7 +28,7 @@ public:
         weaponTimer = std::make_unique<CallbackTimer>();
         weaponTimer->addCallback(
                 [this, newProjectilePool]() { this->shoot(); },
-                100);
+                250);
 
     }
 
@@ -49,14 +51,11 @@ public:
         if (currentKeyStates[SDL_SCANCODE_D]) {
             offset.x++;
         }
-        if (currentKeyStates[SDL_SCANCODE_SPACE]) {
-            weaponTimer->update();
-        }
 
         offset *= speed * deltaTime;
+        this->translatePosition(offset);
 
-        this->movePosition(offset);
-
+        weaponTimer->update();
         projectilePool->update(deltaTime);
 
     }
@@ -64,12 +63,14 @@ public:
     void shoot() {
         if (weapon > 1) {
             float angleStep = 15.0f; // Шаг между снарядами в градусах
-            float startAngle = -(weapon - 1) * angleStep / 2.0f; // Начальный угол, чтобы снаряды были симметрично распределены
+            float startAngle =
+                    -(weapon - 1) * angleStep / 2.0f; // Начальный угол, чтобы снаряды были симметрично распределены
             for (int i = 0; i < weapon; i++) {
-                projectilePool->getProjectile(getCenterPosition(), startAngle + i * angleStep);
+                projectilePool->getProjectile(getCenterPosition(), startAngle + i * angleStep,
+                                              ProjectileObject::PLAYER);
             }
         } else {
-            projectilePool->getProjectile(getCenterPosition(), 0);
+            projectilePool->getProjectile(getCenterPosition(), 0, ProjectileObject::PLAYER);
         }
     }
 
@@ -79,17 +80,23 @@ public:
             health -= 10;
         }
 
-        if(auto powerup = dynamic_cast<PowerupObject *>(object)){
+        if (auto powerup = dynamic_cast<PowerupObject *>(object)) {
             powerup->setAlive(false);
-            if(powerup->getType() == PowerupPrototype::REPAIR_BONUS){
+            if (powerup->getType() == PowerupPrototype::REPAIR_BONUS) {
                 health += 30;
-            }else if(powerup->getType() == PowerupPrototype::WEAPON_UPGRADE){
+            } else if (powerup->getType() == PowerupPrototype::WEAPON_UPGRADE) {
                 weapon += 1;
-                if(weapon > 12){
+                if (weapon > 12) {
                     weapon = 12;
                 }
             }
+        }
 
+        if (auto projectile = dynamic_cast<ProjectileObject *>(object)) {
+            if (projectile->getOwner() == ProjectileObject::ENEMY) {
+                projectile->setAlive(false);
+                health -= 5;
+            }
         }
     }
 
@@ -97,7 +104,7 @@ public:
 
     }
 
-    int getHealth() {
+    int getHealth() const {
         return health;
     }
 
@@ -107,6 +114,7 @@ private:
     std::shared_ptr<ProjectilePool> projectilePool;
 
     int health = 100;
+    int score = 0;
     float_t speed = 100.f;
 
     std::unique_ptr<CallbackTimer> weaponTimer;

@@ -15,6 +15,7 @@
 #include "Texture.h"
 #include "VertexArrayObject.h"
 #include "Object.h"
+#include "Animation.h"
 
 class TexturedObject : public Object {
 public:
@@ -24,46 +25,60 @@ public:
 
 
         float vertexes[] = {
-                pos.x, pos.y,
-                pos.x + size.x, pos.y,
-                pos.x + size.x, pos.y + size.y,
-                pos.x, pos.y + size.y
+                // Triangle 1: Bottom-left quad triangle
+                pos.x, pos.y,                           // Bottom-left
+                pos.x + size.x, pos.y,                  // Bottom-right
+                pos.x, pos.y + size.y,                  // Top-left
+                
+                // Triangle 2: Top-right quad triangle
+                pos.x + size.x, pos.y,                  // Bottom-right
+                pos.x + size.x, pos.y + size.y,        // Top-right
+                pos.x, pos.y + size.y                   // Top-left
         };
 
         float texcoords[] = {
-                0.0f, 0.0f,
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f
+                // Triangle 1: Bottom-left quad triangle
+                0.0f, 0.0f,     // Bottom-left
+                1.0f, 0.0f,     // Bottom-right
+                0.0f, 1.0f,     // Top-left
+                
+                // Triangle 2: Top-right quad triangle
+                1.0f, 0.0f,     // Bottom-right
+                1.0f, 1.0f,     // Top-right
+                0.0f, 1.0f      // Top-left
         };
 
-        vao->createBuffer(VertexArrayObject::VERTEX_BUFFER, vertexes, 8 * sizeof(float));
-        vao->createBuffer(VertexArrayObject::TEXTURE_BUFFER, texcoords, 8 * sizeof(float));
+        vao->createBuffer(VertexArrayObject::VERTEX_BUFFER, vertexes, 12 * sizeof(float));
+        vao->createBuffer(VertexArrayObject::TEXTURE_BUFFER, texcoords, 12 * sizeof(float));
     }
 
     void setTexture(std::shared_ptr<Texture> texture) {
         this->texture = texture;
         float vertexes[] = {
-                position.x, position.y,
-                position.x + texture->getSize().x, position.y,
-                position.x + texture->getSize().x, position.y + texture->getSize().y,
-                position.x, position.y + texture->getSize().y
+                // Triangle 1: Bottom-left quad triangle
+                position.x, position.y,                                    // Bottom-left
+                position.x + texture->getSize().x, position.y,            // Bottom-right
+                position.x, position.y + texture->getSize().y,            // Top-left
+                
+                // Triangle 2: Top-right quad triangle
+                position.x + texture->getSize().x, position.y,            // Bottom-right
+                position.x + texture->getSize().x, position.y + texture->getSize().y,  // Top-right
+                position.x, position.y + texture->getSize().y             // Top-left
         };
-        vao->updateBufferData(VertexArrayObject::VERTEX_BUFFER, vertexes, 8 * sizeof(float));
-
+        vao->updateBufferData(VertexArrayObject::VERTEX_BUFFER, vertexes, 12 * sizeof(float));
     }
-
 
     void setMaterial(std::shared_ptr<Shader> shader) {
         this->shader = shader;
     }
 
-    virtual void draw() {
+    void draw() override {
+        recalculateBuffer();
         texture->bind();
         Object::draw();
     }
 
-private:
+protected:
     std::shared_ptr<Texture> texture;
 
 };

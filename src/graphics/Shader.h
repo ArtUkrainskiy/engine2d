@@ -5,12 +5,14 @@
 #ifndef INC_2DSDL_SHADER_H
 #define INC_2DSDL_SHADER_H
 
-#include <GLES3/gl3.h>
-
 #include <string_view>
+
+#include <GLES3/gl3.h>
 #include <glm/gtc/type_ptr.hpp>
 
-class Shader {
+#include "Resource.h"
+
+class Shader : public Resource {
 public:
     Shader(std::string_view, std::string_view);
 

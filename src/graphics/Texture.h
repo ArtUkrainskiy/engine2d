@@ -10,10 +10,11 @@
 
 #include <SDL2/SDL_image.h>
 #include <GLES3/gl3.h>
-
 #include <glm/vec2.hpp>
 
-class Texture {
+#include "Resource.h"
+
+class Texture : public Resource {
 public:
     explicit Texture(std::string_view path);
 

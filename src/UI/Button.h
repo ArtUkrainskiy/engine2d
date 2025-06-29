@@ -8,9 +8,11 @@
 
 #include <functional>
 #include "../graphics/WireObject.h"
-#include "../core/EventObserver.h"
+#include "../core/IEventObserver.h"
+#include "../core/ServiceProvider.h"
+#include "../core/Camera.h"
 
-class Button : public WireObject, public EventObserver {
+class Button : public WireObject, public IEventObserver {
 public:
     Button(glm::vec2 pos, glm::vec2 size, const std::shared_ptr<Shader> &shader, glm::vec4 color) :
             WireObject(pos, size, shader, color) {
@@ -22,6 +24,11 @@ public:
             int x, y;
             SDL_GetMouseState(&x, &y);
             glm::vec2 mousePos(x, y);
+            
+            // Convert screen coordinates to world coordinates using camera
+            if (const auto camera = ServiceProvider::get<Camera>()) {
+                mousePos = camera->screenToWorld(mousePos);
+            }
 
             if (isInside(mousePos, this->position, this->size)) {
                 clicked();

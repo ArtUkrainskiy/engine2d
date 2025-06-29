@@ -13,6 +13,21 @@ class AsteroidObject : public TexturedObject {
 public:
     using TexturedObject::TexturedObject;
 
+    bool applyDamage(int damage){
+        health -= damage;
+        if(health > 0){
+            return true;
+        }else{
+            alive = false;
+            return false;
+        }
+    }
+
+    void initialize(int newHealth, int newScore){
+        health = newHealth;
+        score = newScore;
+    }
+
     void setSpeed(float newSpeed) {
         speed = newSpeed;
     }
@@ -27,11 +42,11 @@ public:
     }
 
     void update(float deltaTime) {
-        setAngle(rotationSpeed * deltaTime);
-        movePosition(direction * speed * deltaTime);
+        setAngle(getAngle() + rotationSpeed * deltaTime);
+        translatePosition(direction * speed * deltaTime);
     }
 
-    bool isAlive() {
+    bool isAlive() const {
         return alive;
     }
 
@@ -39,9 +54,19 @@ public:
         alive = newAlive;
     }
 
+    int getScore() const{
+        return score;
+    }
+
+    int getHealth() const{
+        return health;
+    }
+
 private:
     float speed;
     bool alive = true;
+    int health;
+    int score;
     glm::vec2 target;
     glm::vec2 direction;
 
