@@ -20,10 +20,13 @@
 
 #include <SDL.h>
 
+class GameOverScene;
 
 class GameScene : public IGameScene, public std::enable_shared_from_this<GameScene> {
 public:
     void initialize() override {
+        IGameScene::initialize(); // Create scene-scoped InputHandler
+        
         auto resourceManager = ServiceProvider::get<ResourceManager>();
 
         callbackTimer = std::make_unique<CallbackTimer>();
@@ -98,8 +101,7 @@ public:
             updateCameraControls();
             
             if (player->getHealth() <= 0) {
-                paused = true;
-                hud->pause();
+                ServiceProvider::get<SceneManager>()->activate<GameOverScene>();
             }
         }
     }

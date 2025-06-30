@@ -12,9 +12,10 @@
 class MenuScene : public IGameScene, public std::enable_shared_from_this<MenuScene> {
 public:
     void initialize() override {
+        IGameScene::initialize(); // Create scene-scoped InputHandler
+        
         auto resourceManager = ServiceProvider::get<ResourceManager>();
 
-        inputHandler = ServiceProvider::get<IWindow>()->getInputHandler();
         auto mainLayer = std::make_shared<RenderLayer>();
         layers.push_back(mainLayer);
 
@@ -35,14 +36,13 @@ public:
                 {1, 1, 1, 1}
         );
 
-        playButton->onClick([playButton]() {
+        playButton->onClick([]() {
             ServiceProvider::get<SceneManager>()->activate<GameScene>();
         });
 
         mainLayer->addObject(playButton);
 
-
-        inputHandler->addObserver(playButton.get());
+        getInputHandler()->addObserver(playButton);
     }
 
     void activate() override {
@@ -50,7 +50,7 @@ public:
     }
 
     void update(float timeDelta) override {
-        inputHandler->handleInput();
+        // Input handled by Window - no need to call handleInput() here
     }
 
     void deactivate() override {
@@ -67,8 +67,7 @@ public:
         }
     }
 
-public:
-    InputHandler *inputHandler;
+private:
 
 };
 

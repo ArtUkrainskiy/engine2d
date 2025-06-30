@@ -6,6 +6,7 @@
 #include "scenes/MenuScene.h"
 #include "scenes/GameScene.h"
 #include "scenes/ScoreScene.h"
+#include "scenes/GameOverScene.h"
 
 
 int main() {
@@ -28,6 +29,7 @@ int main() {
     sceneManager->createScene<MenuScene>();
     sceneManager->createScene<GameScene>();
     sceneManager->createScene<ScoreScene>();
+    sceneManager->createScene<GameOverScene>();
 
 
     sceneManager->activate<MenuScene>();

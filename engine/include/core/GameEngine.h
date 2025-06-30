@@ -18,10 +18,17 @@ public:
 
     bool update(){
         const auto timeDelta = fpsCounter->update();
+        
+        // Handle system events first (like SDL_QUIT)
+        if (!window || !window->update()) {
+            return false;
+        }
+        
         renderer->draw();
         sceneManager->getActiveScene()->update(timeDelta);
         sceneManager->getActiveScene()->render(timeDelta);
-        return window && window->update();
+        
+        return true;
     }
 
 

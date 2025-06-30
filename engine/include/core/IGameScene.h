@@ -6,12 +6,17 @@
 #define ENGINE_IGAMESCENE_H
 
 #include <vector>
+#include <memory>
 #include "../graphics/RenderLayer.h"
+#include "InputHandler.h"
 class Renderer;
 
 class IGameScene {
 public:
-    virtual void initialize() = 0;
+    virtual void initialize() {
+        // Create scene-scoped InputHandler
+        sceneInputHandler = std::make_unique<InputHandler>();
+    }
 
     virtual void activate() = 0;
 
@@ -27,8 +32,13 @@ public:
         layers.push_back(layer);
     }
 
+    InputHandler* getInputHandler() {
+        return sceneInputHandler.get();
+    }
+
 protected:
     std::vector<std::shared_ptr<RenderLayer>> layers;
+    std::unique_ptr<InputHandler> sceneInputHandler;
 
 };
 

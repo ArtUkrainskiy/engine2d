@@ -7,9 +7,11 @@
 
 
 #include <SDL_events.h>
+#include <memory>
 
-class IEventObserver {
+class IEventObserver : public std::enable_shared_from_this<IEventObserver> {
 public:
+    virtual ~IEventObserver() = default;
     virtual void onNotify(SDL_Event& event) = 0;
 };
 

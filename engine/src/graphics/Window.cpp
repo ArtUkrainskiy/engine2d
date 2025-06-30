@@ -3,6 +3,8 @@
 //
 
 #include "graphics/Window.h"
+#include "core/ServiceProvider.h"
+#include "core/SceneManager.h"
 
 #include <GLES3/gl3.h>
 
@@ -63,7 +65,24 @@ int Window::init() {
 }
 
 bool Window::update() {
-    inputHandler->handleInput();
+    // Process events and forward to active scene
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        // Handle system events in Window
+        if (event.type == SDL_QUIT) {
+            running = false;
+        }
+        
+        // Forward events to active scene InputHandler
+        auto sceneManager = ServiceProvider::get<SceneManager>();
+        if (sceneManager && sceneManager->getActiveScene()) {
+            auto activeScene = sceneManager->getActiveScene();
+            if (auto sceneInputHandler = activeScene->getInputHandler()) {
+                sceneInputHandler->forwardEvent(event);
+            }
+        }
+    }
+    
     SDL_GL_SwapWindow(window);
     return running;
 }

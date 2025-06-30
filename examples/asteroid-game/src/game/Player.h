@@ -105,6 +105,12 @@ public:
         return health;
     }
 
+    void resetPlayer() {
+        health = 100;
+        weapon = 1;
+        setCenterPosition({400, 480});
+    }
+
 private:
     int weapon = 1;
 

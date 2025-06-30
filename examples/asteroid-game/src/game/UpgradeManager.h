@@ -14,7 +14,8 @@
 class UpgradeManager {
 public:
     explicit UpgradeManager(const std::shared_ptr<Player> &player) {
-        ServiceProvider::get<EventDispatcher>()->registerListener(
+        eventDispatcher = ServiceProvider::get<EventDispatcher>();
+        listenerId = eventDispatcher->registerListener(
                 EventDispatcher::EVENT_SCORE_REACHED,
                 [this](EventDispatcher::EventType event, const std::shared_ptr<Object> &trigger) {
                     checkAvailableUpgrades();
@@ -27,6 +28,13 @@ public:
         upgradeTree = new UpgradeTree(root);
         nextGoal = upgradeScoreTable[upgradeIndex];
 
+    }
+
+    ~UpgradeManager() {
+        if (eventDispatcher) {
+            eventDispatcher->unregisterListener(EventDispatcher::EVENT_SCORE_REACHED, listenerId);
+        }
+        delete upgradeTree;
     }
 
     void checkAvailableUpgrades() {
@@ -45,6 +53,8 @@ public:
 private:
     UpgradeTree *upgradeTree;
     ScoreManager *scoreManager;
+    EventDispatcher *eventDispatcher;
+    EventDispatcher::ListenerId listenerId;
     uint32_t nextGoal = 0;
     uint32_t upgradeIndex = 0;
     std::array<uint32_t, 10> upgradeScoreTable = {100, 300, 750, 1500, 3000, 5000, 10000, 25000, 50000, 100000};
