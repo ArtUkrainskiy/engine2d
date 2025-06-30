@@ -1,7 +1,7 @@
 //
 // Created by artem on 29.05.24.
 //
-#include "engine/Engine.h"
+#include <Engine.h>
 
 #include "scenes/MenuScene.h"
 #include "scenes/GameScene.h"
