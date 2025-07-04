@@ -35,22 +35,22 @@ public:
         callbackTimer = std::make_unique<CallbackTimer>();
 
         callbackTimer->addCallback(
-                [this]() {
-                    addObject(powerupFactory->build(PowerupPrototype::REPAIR_BONUS));
-                },
-                7000);
+            [this]() {
+                addObject(powerupFactory->build(PowerupPrototype::REPAIR_BONUS));
+            },
+            7000);
 
         callbackTimer->addCallback(
-                [this]() {
-                    addObject(powerupFactory->build(PowerupPrototype::WEAPON_UPGRADE));
-                },
-                9000);
+            [this]() {
+                addObject(powerupFactory->build(PowerupPrototype::WEAPON_UPGRADE));
+            },
+            9000);
 
     }
 
     void addObject(const std::shared_ptr<PowerupObject> &object) {
         renderLayer->addObject(object);
-        collisionDetector->addObject(object.get());
+        collisionDetector->addObject<PowerupObject>(object.get());
         objects.push_back(object);
     }
 

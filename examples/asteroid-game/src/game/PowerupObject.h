@@ -8,7 +8,7 @@
 
 #include <Engine.h>
 
-class PowerupObject : public TexturedObject, public PhysicObject {
+class PowerupObject : public TexturedObject, public IPhysicObject {
 public:
     PowerupObject(glm::vec2 pos, glm::vec2 size, const std::shared_ptr<Shader> &shader,
                   const std::shared_ptr<Texture> &texture, int type) : TexturedObject(pos, size, shader, texture), type(type) {

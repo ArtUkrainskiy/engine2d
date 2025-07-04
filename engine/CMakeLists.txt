@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.22)
 project(GameEngine VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -29,59 +29,55 @@ include_directories(${SDL2TTF_INCLUDE_DIR})
 # Создать библиотеку движка
 add_library(GameEngine STATIC
     # Core
-    src/core/Engine.cpp
-    src/core/ServiceProvider.cpp
-    src/core/EventDispatcher.cpp
-    src/core/IEventObserver.cpp
-    src/core/InputHandler.cpp
-    src/core/ResourceManager.cpp
-    src/core/SceneManager.cpp
-    src/core/Camera.cpp
+        core/ServiceProvider.cpp
+        core/EventDispatcher.cpp
+        core/InputHandler.cpp
+        core/ResourceManager.cpp
+        core/SceneManager.cpp
+        core/Camera.cpp
+        core/Transform.cpp
     
     # Graphics
-    src/graphics/Window.cpp
-    src/graphics/Texture.cpp
-    src/graphics/Shader.cpp
-    src/graphics/VertexArrayObject.cpp
-    src/graphics/Animation.cpp
-    src/graphics/AnimationController.cpp
-    src/graphics/Object.cpp
-    src/graphics/TextRenderer.cpp
-    src/graphics/TexturedObject.cpp
-    src/graphics/RenderLayer.cpp
-    src/graphics/OpenGLRenderer.cpp
-    src/graphics/WireObject.cpp
-    src/graphics/Renderer.cpp
-    src/graphics/Scene.cpp
-    src/graphics/Tile.cpp
-    
-    # Physics
-    src/physics/CollisionDetector.cpp
-    src/physics/PhysicObject.cpp
-    # src/physics/DynamicPhysicsObject.cpp  # Требует Box2D
+        graphics/SDL2Window.cpp
+        graphics/Texture.cpp
+        graphics/Shader.cpp
+        graphics/VertexArrayObject.cpp
+        graphics/Animation.cpp
+        graphics/AnimationController.cpp
+        graphics/BatchObject.cpp
+        graphics/InstancedBatchObject.cpp
+        graphics/Object.cpp
+        graphics/TexturedObject.cpp
+        graphics/RenderLayer.cpp
+        graphics/WireObject.cpp
+        graphics/Renderer.cpp
+        graphics/Scene.cpp
+
+        # Physics
+        physics/CollisionDetector.cpp
+        # src/physics/DynamicPhysicsObject.cpp  # Требует Box2D
     
     # Sounds
-    src/sounds/SoundPlayer.cpp
+        sounds/Sound.cpp
+        sounds/SoundPlayer.cpp
     
     # UI
-    src/ui/Button.cpp
-    src/ui/TextLabel.cpp
-    src/ui/UIBuilder.cpp
+        ui/Button.cpp
+        ui/TextLabel.cpp
+        ui/UIBuilder.cpp
     
     # Utils
-    src/utils/Utils.cpp
-    src/utils/CallbackTimer.cpp
+        utils/Utils.cpp
+        utils/CallbackTimer.cpp
     
     # Math
-    src/math/Vector.cpp
-    src/math/Rectangle.cpp
 )
 
 # Публичные заголовки
 target_include_directories(GameEngine 
     PUBLIC 
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>
     INTERFACE
         $<INSTALL_INTERFACE:include>
 )

@@ -58,22 +58,22 @@ public:
         callbackTimer = std::make_unique<CallbackTimer>();
         // Таймер спавнит астероиды раз в n мс
         callbackTimer->addCallback(
-                [this]() { addObject(asteroidFactory->build(AsteroidPrototype::SMALL)); },
-                300 * 2);
+            [this]() { addObject(asteroidFactory->build(AsteroidPrototype::SMALL)); },
+            300 * 2);
 
         callbackTimer->addCallback(
-                [this]() { addObject(asteroidFactory->build(AsteroidPrototype::MEDIUM)); },
-                500 * 2);
+            [this]() { addObject(asteroidFactory->build(AsteroidPrototype::MEDIUM)); },
+            500 * 2);
 
         callbackTimer->addCallback(
-                [this]() { addObject(asteroidFactory->build(AsteroidPrototype::LARGE)); },
-                750 * 2);
+            [this]() { addObject(asteroidFactory->build(AsteroidPrototype::LARGE)); },
+            750 * 2);
 
     }
 
     void addObject(const std::shared_ptr<AsteroidObject> &object) {
         renderLayer->addObject(object);
-        collisionDetector->addObject(object.get());
+        collisionDetector->addObject<AsteroidObject>(object.get());
         objects.push_back(object);
     }
 

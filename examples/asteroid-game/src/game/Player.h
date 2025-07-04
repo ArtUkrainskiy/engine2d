@@ -15,7 +15,7 @@
 class Player
         : public IEventObserver,
           public TexturedObject,
-          public PhysicObject,
+          public IPhysicObject,
           public std::enable_shared_from_this<Player> {
 public:
     Player(glm::vec2 pos, glm::vec2 size, const std::shared_ptr<Shader> &shader,
@@ -24,8 +24,8 @@ public:
 
         weaponTimer = std::make_unique<CallbackTimer>();
         weaponTimer->addCallback(
-                [this, newProjectilePool]() { this->shoot(); },
-                250);
+            [this]() { this->shoot(); },
+            100);
 
     }
 

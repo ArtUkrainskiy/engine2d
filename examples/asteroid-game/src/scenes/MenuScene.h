@@ -37,7 +37,10 @@ public:
         );
 
         playButton->onClick([]() {
-            ServiceProvider::get<SceneManager>()->activate<GameScene>();
+            auto sceneManager = ServiceProvider::get<SceneManager>();
+            sceneManager->removeScene<GameScene>();
+            sceneManager->createScene<GameScene>();
+            sceneManager->activate<GameScene>();
         });
 
         mainLayer->addObject(playButton);
@@ -46,7 +49,6 @@ public:
     }
 
     void activate() override {
-        ServiceProvider::get<IRenderer>()->setActiveScene(shared_from_this());
     }
 
     void update(float timeDelta) override {

@@ -11,7 +11,7 @@
 
 int main() {
     auto engine = new GameEngine();
-    const auto window = engine->createWindow<Window>(800, 600);
+    const auto window = engine->createWindow<SDL2Window>(800, 600, "Asteroid Game");
     engine->createRenderer<Renderer>();
     auto resourceManager = engine->createResourceManager();
     engine->createEventDispatcher();

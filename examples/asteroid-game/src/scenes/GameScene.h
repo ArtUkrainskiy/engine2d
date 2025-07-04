@@ -52,16 +52,16 @@ public:
 
         player = std::make_shared<Player>(
                 glm::vec2(370, 450),  // Начальная позиция: центр внизу экрана
-                glm::vec2(60, 60),
+                glm::vec2(50, 50),
                 resourceManager->get<Shader>("rectTextured"),
-                resourceManager->get<Texture>("MainShip2"),
+                resourceManager->get<Texture>("enemy1"),
                 projectilePool
         );
         player->setSpeed(250.f);
         player->setCenterPosition({400, 480});  // Центрируем по X, почти внизу по Y
         playerLayer->addObject(player);
 
-        collisionDetector->addObject(player.get());
+        collisionDetector->addObject<Player>(player.get());
 
 
         auto background = std::make_shared<Object>(
@@ -74,17 +74,10 @@ public:
         upgradeManager = std::make_unique<UpgradeManager>(player);
         hud = std::make_unique<HUDInterface>(UILayer, player);
 
-
-
-
-
-
-
         paused = false;
     }
 
     void activate() override {
-        ServiceProvider::get<IRenderer>()->setActiveScene(shared_from_this());
     }
 
     void update(float timeDelta) override {
@@ -163,7 +156,7 @@ private:
 
     std::unique_ptr<UpgradeManager> upgradeManager;
 
-    bool paused;
+    bool paused = false;
 };
 
 

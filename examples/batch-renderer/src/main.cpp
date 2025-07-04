@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[]) {
     const auto engine = new GameEngine();
-    const auto window = engine->createWindow<Window>(1600, 900);
+    const auto window = engine->createWindow<SDL2Window>(1600, 900, "123");
     engine->createRenderer<Renderer>();
 
     const auto resourceManager = engine->createResourceManager();

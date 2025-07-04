@@ -15,7 +15,7 @@
 #include "ScoreManager.h"
 
 
-class ProjectileObject : public WireObject, public PhysicObject {
+class ProjectileObject : public WireObject, public IPhysicObject {
 public:
     enum Owner {
         PLAYER = 0,

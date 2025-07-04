@@ -11,7 +11,7 @@
 #include "ProjectilePool.h"
 #include <glm/gtx/string_cast.hpp>
 
-class EnemyObject : public TexturedObject, public PhysicObject {
+class EnemyObject : public TexturedObject, public IPhysicObject {
 public:
     EnemyObject(glm::vec2 pos, glm::vec2 size, const std::shared_ptr<Shader> &shader,
                 const std::shared_ptr<Texture> &texture, const std::shared_ptr<ProjectilePool> &projectilePool) :
@@ -20,10 +20,10 @@ public:
 
         weaponTimer = std::make_unique<CallbackTimer>();
         weaponTimer->addCallback(
-                [this, projectilePool]() {
-                    projectilePool->getProjectile(getCenterPosition(), 180, ProjectileObject::ENEMY);
-                },
-                333);
+            [this, projectilePool]() {
+                projectilePool->getProjectile(getCenterPosition(), 180, ProjectileObject::ENEMY);
+            },
+            333);
     }
 
     void setCenterPosition(glm::vec2 center) {

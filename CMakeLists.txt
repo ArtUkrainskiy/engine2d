@@ -12,6 +12,8 @@ add_subdirectory(engine)
 # Добавить примеры (всегда)
 add_subdirectory(examples)
 
+add_subdirectory(asteroids)
+
 # Добавить тесты (если директория существует)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
     add_subdirectory(tests)

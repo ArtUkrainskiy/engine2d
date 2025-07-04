@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.22)
 project(AsteroidGame)
 
 add_executable(AsteroidGame
@@ -44,6 +44,6 @@ target_link_libraries(AsteroidGame PRIVATE GameEngine)
 
 # Копировать ресурсы
 add_custom_command(TARGET AsteroidGame POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:AsteroidGame>/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:AsteroidGame>/assets
 )

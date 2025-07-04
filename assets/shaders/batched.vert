@@ -3,21 +3,19 @@
 // Base quad vertices (normalized 0-1)
 layout (location = 0) in vec2 position;
 
-// Instance data
-layout (location = 2) in vec2 instancePos;
-layout (location = 3) in vec2 instanceSize;
-layout (location = 4) in vec4 instanceColor;
+// Instance data - mat4 takes 4 attribute locations (1-4)
+layout (location = 1) in mat4 instanceTransform;
+layout (location = 5) in vec4 instanceColor;
 
-// For batched rendering, we use combined matrix since instances handle transforms
+// Camera matrices
 uniform mat4 projection;
+uniform mat4 view;
 
 out vec4 vertexColor;
 
 void main()
 {
-    // Transform normalized quad to world position
-    vec2 worldPos = instancePos + position * instanceSize;
-    
-    gl_Position = projection * vec4(worldPos, 0.0, 1.0);
+    // Transform unit quad using instance transform matrix
+    gl_Position = projection * view * instanceTransform * vec4(position, 0.0, 1.0);
     vertexColor = instanceColor;
 }
